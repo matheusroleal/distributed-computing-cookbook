@@ -1,0 +1,2 @@
+setup:
+	@luarocks install luasocket
