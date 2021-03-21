@@ -1,14 +1,14 @@
 package = "lua-rpc"
 version = "0.0.1-1"
 source = {
-  url = "git://github.com/Olivine-Labs/busted",
+  url = "git://github.com/matheusroleal/distributed-computing-cookbook/",
   branch = "master"
 }
 description = {
    summary = "A Lua>=5.2 library for generating and processing RPC",
    detailed = "A Lua>=5.2 library for generating and processing RPC",
-   homepage = "*** please enter a project homepage ***",
-   license = "BSD"
+   homepage = "github.com/matheusroleal/distributed-computing-cookbook/",
+   license = "MIT"
 }
 dependencies = {
   "lua >= 5.2",
@@ -16,7 +16,7 @@ dependencies = {
 build = {
    type = "builtin",
    modules = {
-      ["lua-rpc.client"] = "src/client.lua",
-      ["lua-rpc.server"] = "src/server.lua"
-   }
+      ["lua-rpc"] = "rpc/src/lua-rpc.lua"
+   },
+   copy_directories = { "rpc/src" } 
 }
