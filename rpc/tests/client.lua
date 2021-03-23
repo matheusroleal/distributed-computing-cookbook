@@ -15,4 +15,6 @@ client.rpc.twice(2)
 
 -- -- you can also define function-specific callbacks.
 -- -- prototype is client:call(function_name, on_success, on_failure, ...)
--- client:call('thrice', function(result) print('3 * 2 = ', result) end, function(err) print("RPC error:", err), 3)
+client:call('thrice', function(result) print('3 * 2 = ', result) end, function(err) print("RPC error:", err) end, 3)
+
+client:dispatch()

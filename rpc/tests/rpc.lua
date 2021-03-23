@@ -103,7 +103,9 @@ function server:serve()
 	local client,err = self.socket:accept()
 	if client then
 		local line = client:receive()
-				
+		
+		print('I received the following message:', line)
+		
 		request_decode = json.decode(line)
 		local func = request_decode['method']
 		local args = request_decode['params']
@@ -116,8 +118,12 @@ function server:serve()
 		response['result'] = ret
 
 		local str = json.encode(response)
-				
+		
+		print('Send it back' .. str)
+		
 		client:send(str)
+
+		print('Closing it')
 
 		client:close()
 	elseif not client and err ~= 'timeout' then
@@ -155,6 +161,7 @@ local function query(self, func, args)
 	request['params'] = args
 
 	local str = json.encode(request) .. "\r\n"
+	print('Sending it', str)
 
 	_, err = client:send(str)
 	if err then
@@ -170,6 +177,10 @@ local function query(self, func, args)
 
 		local func = request_decode['method']
 		local result = request_decode['result']
+
+		print(func)
+		print(result)
+		print(' ')
 
 		coroutine.yield()
 	end
