@@ -15,8 +15,10 @@ while 1 do
   client:settimeout(10)
   -- receive the line
   local line, err = client:receive()
-
-  if not err then client:send(line .. "\n") end
+  
+  print('I received the following message:', line)
+  
+  if not err then client:send(line .. ' from server') end
 
   client:close()
 end
