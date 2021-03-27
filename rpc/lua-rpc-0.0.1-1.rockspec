@@ -1,4 +1,4 @@
-package = "lua-rpc"
+package = "luarpc"
 version = "0.0.1-1"
 source = {
   url = "git://github.com/matheusroleal/distributed-computing-cookbook/",
@@ -16,7 +16,7 @@ dependencies = {
 build = {
    type = "builtin",
    modules = {
-      ["lua-rpc"] = "rpc/src/lua-rpc.lua"
+      ["luarpc"] = "rpc/src/luarpc.lua"
    },
    copy_directories = { "rpc/src" } 
 }
