@@ -5,9 +5,6 @@ local myobj1 = { foo = function (a, s, st, n) return a*2, string.len(s) + st.ida
 local myobj2 = { foo = function (a, s, st, n) return 0.0, 1 end, boo = function (n) return 1, { nome = "Teo", idade = 60, peso = 73.0} end }
 
 local address, port = lrpc.createServant(myobj1,'interface.lua')
-print('Port from the first Servant ' .. port)
-
 address, port = lrpc.createServant(myobj2,'interface.lua')
-print('Port from the second Servant ' .. port)
 
 lrpc.waitIncoming()

@@ -10,8 +10,17 @@ client.on_success = print
 client.on_failure = error
 
 -- queue some functions
-local r, s = client.rpc.foo(3, "alo", {nome = "Aaa", idade = 20, peso = 55.0}, 1)
+local t, p = client.rpc.foo(3, "alo", {nome = "Aaa", idade = 20, peso = 55.0}, 1)
+print('Request result for foo(3, "alo", {nome = "Aaa", idade = 20, peso = 55.0}, 1) ')
+print(t)
+print(p)
 
-local t, p = client.rpc.boo(20)
+t, p = client.rpc.boo(20)
+print('Request result for boo(20) ')
+print(t)
+print(p)
 
 t, p = client.rpc.boo('matheus')
+print('Request result for boo("matheus") ')
+print(t)
+print(p)
