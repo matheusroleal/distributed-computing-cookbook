@@ -17,6 +17,8 @@ function struct(strct)
 	mystruct = strct
 end
 
+pool_client = {}
+
 --
 -- LOCAL FUNCTIONS
 --
@@ -178,48 +180,35 @@ function server:register(name, func)
 	self.registry[name] = func
 end
 
-function server:remove(name)
-	assert(name, "Missing argument: `name'")
-	self.registry[name] = nil
-end
-
-function server:defined(name)
-	assert(name, "Missing argument: `name'")
-	return self.registry[name] ~= nil
-end
-
 function server:serve(interface_rpc)
 	assert(self.socket, "Server socket not initialized")
 
 	local client,err = self.socket:accept()
 	if client then
 		local line = client:receive()
-
-		print('I received the following message:', line)
-
+		print('[RPC SERVER] I received the following message:', line)
+		-- Deconding the request
 		request_decode = json.decode(line)
 		local func = request_decode['method']
 		local args = request_decode['params']
- 
+		-- Forming the request protocol
 		local response = {}
 		response['method'] = func
-
+		-- Validating the request
 		local resp = validate_args(func, args, interface_rpc, "in")
 		if resp then
 			response['type'] = 'ERROR'
-			response['result'] = resp
+			response['error'] = resp
 		else
 			local ok, ret = execute(self, func, args)
 			response['type'] = 'RESPONSE'
 			response['result'] = ret
 		end
-
+		-- Enconding the response
 		local str = json.encode(response) .. "\r\n"
-		
-		print('Send it back' .. str)
-		
+		-- Try to send the response
+		print('[RPC SERVER] Send it back: ' .. str)
 		client:send(str)
-
 		client:close()
 	elseif not client and err ~= 'timeout' then
 		error(err)
@@ -233,40 +222,45 @@ local client = {}
 
 local function query(self, func, args)
 	local client = socket.tcp()
+	-- Create pool with clients
+	pool_client[self.address .. self.port] = client
+	-- Trying to connect to the server
 	client:settimeout(10)
 	local _, err = client:connect(self.address, self.port)
 	if err then
-		return false, ("Cannot connect to %s[%s]: %s"):format(self.address, self.port, err)
+		coroutine.yield( false, ("Cannot connect to %s[%s]: %s"):format(self.address, self.port, err) )
 	end
-
+	-- Forming the request protocol
 	local request = {}
 	request['type'] = 'REQUEST'
 	request['method'] = func
 	request['params'] = args
-
+	-- Enconding the request
 	local str = json.encode(request) .. "\r\n"
-	print('Sending it', str)
-
+	print('[RPC CLIENT] Sending it: ', str)
+	-- Try to send the request
 	_, err = client:send(str)
 	if err then
 		client:close()
-		return false, ("Cannot send query message to %s[%s]: %s"):format(self.address, self.port, err)
+		coroutine.yield( false, ("Cannot send query message to %s[%s]: %s"):format(self.address, self.port, err) )
 	end
-
+	-- Waiting for the response
 	while true do
 		local s, status, partial = client:receive('*l')
-
 		local request_decode = json.decode(s)
-
 		local func = request_decode['method']
 		local result = request_decode['result']
-		
+		-- Check whether the request worked or not
+		if not result then
+			result = serialize(nil, '___ERRORPC: ' .. request_decode['error'])
+		end
 		coroutine.yield(result)
 	end
 end
 
 function client:init(address, port, interface_file)
 	assert(address and port, "Need server address and port")
+	-- Interface upload
 	dofile(interface_file)
 
 	self.address, self.port = address, port
