@@ -1,7 +1,7 @@
 local socket = require("socket")
 
 -- create a TCP socket and bind it to the local host, at any port
-local server = assert(socket.bind("*", 0))
+local server = assert(socket.bind("*", 58041))
 
 -- find out which port the OS chose for us
 local ip, port = server:getsockname()
