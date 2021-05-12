@@ -27,12 +27,23 @@ end
 
 -------------------------------------------------------------------------------- Main Functions
 function luarpc.createServant(obj, interface_path, port)
-  local server = socket.try(socket.bind("*", port))
-  print("Server is running on port: " .. port)
+  if obj == nil then
+    return nil, "Objeto que implementa a interface eh nulo"
+  end
+  if interface_path == nil then
+      return nil, "Arquivo de interface eh nulo"
+  end
+  if port == nil then
+      port = 0
+  end -- default é "0"
+
+  local server = socket.try(socket.bind('127.0.0.1', port))
   table.insert(sockets_lst, server) -- insert at sockets_lst
   servants_lst[server] = {}
   servants_lst[server]["obj"] = obj
   servants_lst[server]["interface"] = interface_path
+  local sIp, sPort = server:getsockname()
+  return {ip = sIp, port = sPort}
 end
 
 function luarpc.createProxy(host, port, interface_path, verbose)
@@ -43,7 +54,7 @@ function luarpc.createProxy(host, port, interface_path, verbose)
       local params = {...}
 
       -- assert parameters doesn't have errors
-      local isValid, params, reasons = validator.validate_client(params,fname,fmethod.args)
+      local isValid, params, reasons = validator.validate_client(params,fname,fmethod.args,struct)
       if not isValid and #reasons > 0 then
         return "[ERROR]: Invalid request. Reason: \n" .. reasons
       end
@@ -53,7 +64,7 @@ function luarpc.createProxy(host, port, interface_path, verbose)
       -- abre nova conexao e envia request
       if coroutine.isyieldable() then -- coroutine-client
         proxy_stub.conn = luarpc.create_client_stub_conn(host, port, true)
-        -- print("\n\t     >>> [cli] createProxy CASE 1", "\n") -- [DEBUG]
+        print("\n\t     >>> [cli] createProxy CASE 1", "\n") -- [DEBUG]
         local curr_co = coroutine.running()
         if (verbose) then
           print("\t     >>> CO RUNNING:", curr_co, "\n")
@@ -64,7 +75,7 @@ function luarpc.createProxy(host, port, interface_path, verbose)
         
        
         
-        -- print("\n\n\t\t >>>>>> [CLT -> SVR] MSG TO BE SENT 1:",msg) -- [DEBUG]
+        print("\n\n\t\t >>>>>> [CLT -> SVR] MSG TO BE SENT 1:",msg) -- [DEBUG]
         proxy_stub.conn:send(msg) -- envia pedido RPC
         local r1, r2 = coroutine.yield() -- CREATE PROXY
       else
@@ -93,6 +104,7 @@ function luarpc.createProxy(host, port, interface_path, verbose)
       proxy_stub.conn:close() -- fecha conexao
 
       local res = marshall.unmarshalling(returns, interface_path) -- converte string para table com results
+      --validator.checkReturnTypes(res, interface.methods[fname].resulttype, interface.methods[fname].args, struct)
       return table.unpack(res) -- retorna results
     end --end of function
   end -- end of for
@@ -234,7 +246,9 @@ function luarpc.process_request(client, request_msg, servant)
   end
 
   -- invoke the method passed in the request with all its parameters and get the result
-  local result = table.pack(servants_lst[servant]["obj"][func_name](table.unpack(params)))
+  local implFunc = servants_lst[servant]["obj"][func_name]
+  local result = table.pack(pcall(implFunc, table.unpack(params)))
+  -- print(result)
   local msg_to_send = marshall.marshalling(result)
   -- print("\n\n\t\t >>>>>> [SVR -> CLT] MSG TO BE SENT FROM SERVER:",msg_to_send) -- [DEBUG]
   return msg_to_send
@@ -296,6 +310,11 @@ function luarpc.print_tables(obj)
     print(obj)
   end
   print("\n")
+end
+
+-- encapsula o socket gettime
+function luarpc.gettime()
+  return socket.gettime()
 end
 
 -------------------------------------------------------------------------------- Return RPC
