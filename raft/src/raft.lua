@@ -49,32 +49,35 @@ function raft.Configure(peers, id)
     raft.running = false
     -- Define Heartbeat variables 
     raft.entries={}
-    raft.heartbeatFrequency = 2
-    raft.randomElectionTimeout = math.random(10,20)
+    raft.heartbeatFrequency = 5
+    raft.randomElectionTimeout = math.random(15,40)
     raft.timeoutLimit = os.time() + raft.randomElectionTimeout
-    print("Heartbeat Timeout Set to " .. tostring(raft.randomElectionTimeout))
+    print("[Node " .. raft.id .."] Heartbeat Timeout Set to " .. tostring(raft.randomElectionTimeout))
 	-- initialize election variables 
     raft.votes = 0
     raft.votingMajority = (#peers / 2) + 1
-    raft.votedFor = nil
 end
 
 function raft.sendHeartbeats()
     raft.active_peers = 0
 	for _, peer in ipairs(raft.remote_peers) do
-        print('Sending Heartbeat For ' .. peer.id)
-        -- create message with heartbeat request
-        local message = {}
-        message.timeout = raft.timeoutLimit
-        message.fromNode = raft.id
-        message.toNode = peer.id
-        message.type = 'heartbeat'
-        message.value = raft.id
-        -- send heartbeats
-        local p = peer.proxy
-        local heartbeatReturn = p.ReceiveMessage(message)
-        if heartbeatReturn == 'ok' then
+        if tonumber(peer.id) == tonumber(raft.id) then
             raft.active_peers = raft.active_peers + 1
+        else
+            print("[Node " .. raft.id .."] Sending Heartbeat For Node" .. peer.id)
+            -- create message with heartbeat request
+            local message = {}
+            message.timeout = raft.timeoutLimit
+            message.fromNode = tonumber(raft.id)
+            message.toNode = tonumber(peer.id)
+            message.type = 'heartbeat'
+            message.value = raft.id
+            -- send heartbeats
+            local p = peer.proxy
+            local heartbeatReturn = p.ReceiveMessage(message)
+            if heartbeatReturn == 'ok' then
+                raft.active_peers = raft.active_peers + 1
+            end
         end
     end
 end
@@ -82,27 +85,35 @@ end
 function raft.startElection()
     raft.votes = 0
 	for _, peer in ipairs(raft.remote_peers) do
-        print('Asking Vote For ' .. peer.id)
-        -- create message with vote request
-        local message = {}
-        message.timeout = raft.timeoutLimit
-        message.fromNode = raft.id
-        message.toNode = peer.id
-        message.type = 'vote'
-        message.value = raft.id
-        -- send vote requests
-        local p = peer.proxy
-        local voteGranted = p.ReceiveMessage(message)
-        if voteGranted == 'ok' then
+        if tonumber(peer.id) == tonumber(raft.id) then
+            -- vote for yourself
             raft.votes = raft.votes + 1
-        end 
+        else
+            print("[Node " .. raft.id .."] Asking Vote For Node " .. peer.id)
+            -- create message with vote request
+            local message = {}
+            message.timeout = raft.timeoutLimit
+            message.fromNode = tonumber(raft.id)
+            message.toNode = tonumber(peer.id)
+            message.type = 'vote'
+            message.value = raft.id
+            -- send vote requests
+            local peer_rpc = peer.proxy
+            local voteGranted = peer_rpc.ReceiveMessage(message)
+            if voteGranted == 'ok' then
+                raft.votes = raft.votes + 1
+            end 
+        end
     end
-    if raft.votes >= raft.votingMajority then
+    print("[Node " .. raft.id .."] got " .. raft.votes .. " votes")
+    if tonumber(raft.votes) >= tonumber(raft.votingMajority) then
+        print("[Node " .. raft.id .."] I'm the leader")
         raft.state = 'leader'
+        -- send to peers the new leader
         raft.sendHeartbeats()
         raft.votes=0
     else
-        print("Waiting For Heartbeat...")
+        print("[Node " .. raft.id .."] Waiting For Heartbeat...")
         luarpc.wait(raft.heartbeatFrequency, false)
     end
 end
@@ -111,16 +122,21 @@ end
 function raft.InitializeNode()
     raft.running = true
     raft.state = 'follower'
+    reset_timeout()
+    luarpc.wait(raft.heartbeatFrequency, false)
     while true do
         if raft.running then
-            print("Node Running...")
+            print("[Node " .. raft.id .."] Running...")
             if raft.state == 'leader' then
+                -- keeping the followers on your side
                 raft.sendHeartbeats()
                 luarpc.wait(raft.heartbeatFrequency, false)
             elseif raft.state == 'candidate' then
+                -- start election to become leader
                 raft.startElection()
             elseif raft.state == 'follower' then
-				-- check if it is able to become a candidate
+                luarpc.wait(raft.heartbeatFrequency, false)
+                -- check if it is able to become a candidate
                 if check_election_timeout(raft.timeoutLimit) then
                     raft.state = 'candidate'
                 end
@@ -129,6 +145,7 @@ function raft.InitializeNode()
             raft.state = 'idle'
             luarpc.wait(raft.heartbeatFrequency, false)
         end
+        luarpc.wait(raft.heartbeatFrequency, false)
     end
 end
 
@@ -137,22 +154,24 @@ function raft.ReceiveMessage(message)
         return 'out'
     end
     if message.type == 'vote' then
-        raft.votedFor = message.fromNode
-        raft.reset_timeout()
+        if raft.state == 'candidate' then
+            return 'no'
+        end
+        print("[Node " .. raft.id .."] Received Vote Request From Node " .. message.fromNode)
+        reset_timeout()
         return 'ok' 
     end
     if message.type == 'heartbeat' then
-        raft.entries = message.value
-        raft.votedFor = message.fromNode
+        print("[Node " .. raft.id .."] Timeout Updated")
         raft.state = 'follower'
-        raft.reset_timeout()
+        reset_timeout()
         return 'ok' 
     end
     if message.type == 'request' then
-        raft.entries = message.value
-        raft.votedFor = message.fromNode
+        print("[Node " .. raft.id .."] Entry Updated")
+        table.insert(raft.entries, tostring(data))
         raft.state = 'follower'
-        raft.reset_timeout()
+        reset_timeout()
         return 'ok' 
     end
     return 'void'
@@ -160,26 +179,32 @@ end
 
 function raft.StopNode()
 	raft.running = false
-    print("Node Stopped")
+    print("[Node " .. raft.id .."] Stopped")
 end 
 
 function raft.ApplyEntry(data) 
     if raft.state == "leader" then
+        raft.active_peers = 0
         for _, peer in ipairs(raft.remote_peers) do
-            print('Applying a New Entry For ' .. peer.id)
-            -- create message with an entry
-            local message = {}
-            message.timeout = raft.timeoutLimit
-            message.fromNode = raft.id
-            message.toNode = peer.id
-            message.type = 'request'
-            message.value = table.insert(raft.entries, tostring(data))
-            -- apply an entry
-            local p = peer.proxy
-            local voteGranted = p.ReceiveMessage(message)
-            if voteGranted == 'ok' then
-                raft.votes = raft.votes + 1
-            end 
+            if tonumber(peer.id) == tonumber(raft.id) then
+                table.insert(raft.entries, tostring(data))
+                print("[Node " .. raft.id .."] Updating Entry For Leader: " .. table_to_string(raft.entries))
+            else
+                print("[Node " .. raft.id .."] Applying a New Entry For Node " .. peer.id)
+                -- create message with an entry
+                local message = {}
+                message.timeout = raft.timeoutLimit
+                message.fromNode = tonumber(raft.id)
+                message.toNode = tonumber(peer.id)
+                message.type = 'request'
+                message.value = tostring(data)
+                -- apply an entry
+                local p = peer.proxy
+                local response = p.ReceiveMessage(message)
+                if heartbeatReturn == 'ok' then
+                    raft.active_peers = raft.active_peers + 1
+                end
+            end
         end
         return 'Done' 
     end
@@ -187,7 +212,7 @@ function raft.ApplyEntry(data)
 end
 
 function raft.Snapshot()
-    print('Entry log: '.. table_to_string(raft.entries))
+    print("[Node " .. raft.id .."] Entry log: ".. table_to_string(raft.entries))
 end
 
 return raft
