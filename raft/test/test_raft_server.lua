@@ -10,7 +10,7 @@ end
 local id = arg[1]
 local port = tonumber(arg[2])
 
-local servers = { { id = 1, port = 1234 }, { id = 2, port = 4321 }, { id = 3, port = 5678 } }
+local servers = { { id = 1, port = 1234 }, { id = 2, port = 4321 }, { id = 3, port = 5678 }, { id = 4, port = 4355 } }
 
 -- Create proxies with other nodes
 local peers = {}
