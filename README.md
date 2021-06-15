@@ -9,7 +9,7 @@ Distributed computing is a model in which components of a software system are sh
 
 - [Client Server](./client-server)
 - [Remote Procedure Call](./rpc)
-
+- [Raft Algorithm](./raft)
 ## Dependencies
 - [Lua](https://www.lua.org/download.html)
 - [LuaRocks](https://github.com/luarocks/luarocks/wiki/Download)

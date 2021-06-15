@@ -1,0 +1,469 @@
+LuaSocket version: LuaSocket 3.0-rc1
+[Node 1] Heartbeat Timeout Set to 16
+LuaSocket version: LuaSocket 3.0-rc1
+[Node 3] Heartbeat Timeout Set to 40
+LuaSocket version: LuaSocket 3.0-rc1
+[Node 2] Heartbeat Timeout Set to 32
+LuaSocket version: LuaSocket 3.0-rc1
+[Node 4] Heartbeat Timeout Set to 25
+[Node 4] Running...
+[Node 2] Running...
+[Node 3] Running...
+[Node 1] Running...
+[Node 4] Running...
+[Node 2] Running...
+[Node 3] Running...
+[Node 1] Running...
+[Node 2] Running...
+[Node 4] Running...
+[Node 1] Running...
+[Node 3] Running...
+[Node 2] Running...
+[Node 1] Running...
+[Node 3] Running...
+[Node 1] Asking Vote For Node 2
+[Node 4] Running...
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{timeout=1620965205, type='vote', fromNode=1, value='1', toNode=2}
+-fim-
+
+[Node 2] Received Vote Request From Node 1
+[Node 1] Asking Vote For Node 3
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{timeout=1620965205, type='vote', fromNode=1, value='1', toNode=3}
+-fim-
+
+[Node 3] Received Vote Request From Node 1
+[Node 1] Asking Vote For Node 4
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{timeout=1620965205, type='vote', fromNode=1, value='1', toNode=4}
+-fim-
+
+[Node 4] Received Vote Request From Node 1
+[Node 1] got 4 votes
+[Node 1] I'm the leader
+[Node 1] Sending Heartbeat For Node2
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{timeout=1620965205, type='heartbeat', fromNode=1, value='1', toNode=2}
+-fim-
+
+[Node 2] Timeout Updated
+[Node 1] Sending Heartbeat For Node3
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{timeout=1620965205, type='heartbeat', fromNode=1, value='1', toNode=3}
+-fim-
+
+[Node 3] Timeout Updated
+[Node 1] Sending Heartbeat For Node4
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{timeout=1620965205, type='heartbeat', fromNode=1, value='1', toNode=4}
+-fim-
+
+[Node 4] Timeout Updated
+[Node 1] Running...
+[Node 1] Sending Heartbeat For Node2
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{timeout=1620965205, type='heartbeat', fromNode=1, value='1', toNode=2}
+-fim-
+
+[Node 2] Timeout Updated
+[Node 1] Sending Heartbeat For Node3
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{timeout=1620965205, type='heartbeat', fromNode=1, value='1', toNode=3}
+-fim-
+
+[Node 3] Timeout Updated
+[Node 1] Sending Heartbeat For Node4
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{timeout=1620965205, type='heartbeat', fromNode=1, value='1', toNode=4}
+-fim-
+
+[Node 4] Timeout Updated
+[Node 2] Running...
+[Node 3] Running...
+[Node 4] Running...
+[Node 1] Running...
+[Node 1] Sending Heartbeat For Node2
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{timeout=1620965205, type='heartbeat', fromNode=1, value='1', toNode=2}
+-fim-
+
+[Node 2] Timeout Updated
+[Node 1] Sending Heartbeat For Node3
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{timeout=1620965205, type='heartbeat', fromNode=1, value='1', toNode=3}
+-fim-
+
+[Node 3] Timeout Updated
+[Node 1] Sending Heartbeat For Node4
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{timeout=1620965205, type='heartbeat', fromNode=1, value='1', toNode=4}
+-fim-
+
+[Node 4] Timeout Updated
+[Node 2] Running...
+[Node 3] Running...
+[Node 4] Running...
+[Node 1] Running...
+[Node 1] Sending Heartbeat For Node2
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{timeout=1620965205, type='heartbeat', fromNode=1, value='1', toNode=2}
+-fim-
+
+[Node 2] Timeout Updated
+[Node 1] Sending Heartbeat For Node3
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{timeout=1620965205, type='heartbeat', fromNode=1, value='1', toNode=3}
+-fim-
+
+[Node 3] Timeout Updated
+[Node 1] Sending Heartbeat For Node4
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{timeout=1620965205, type='heartbeat', fromNode=1, value='1', toNode=4}
+-fim-
+
+[Node 4] Timeout Updated
+[Node 1] Stopped
+[Node 2] Running...
+[Node 3] Running...
+[Node 4] Running...
+[Node 2] Running...
+[Node 3] Running...
+[Node 4] Running...
+[Node 3] Running...
+[Node 2] Running...
+[Node 4] Running...
+[Node 3] Running...
+[Node 2] Running...
+[Node 4] Running...
+[Node 4] Running...
+[Node 3] Running...
+[Node 2] Running...
+[Node 3] Running...
+[Node 2] Running...
+[Node 4] Running...
+[Node 4] Asking Vote For Node 1
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=1, timeout=1620965250, type='vote', fromNode=4, value='4'}
+-fim-
+
+[Node 4] Asking Vote For Node 2
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=2, timeout=1620965250, type='vote', fromNode=4, value='4'}
+-fim-
+
+[Node 2] Received Vote Request From Node 4
+[Node 4] Asking Vote For Node 3
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=3, timeout=1620965250, type='vote', fromNode=4, value='4'}
+-fim-
+
+[Node 3] Received Vote Request From Node 4
+[Node 4] got 3 votes
+[Node 4] I'm the leader
+[Node 4] Sending Heartbeat For Node1
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=1, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 4] Sending Heartbeat For Node2
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=2, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 2] Timeout Updated
+[Node 4] Sending Heartbeat For Node3
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=3, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 3] Timeout Updated
+[Node 4] Running...
+[Node 4] Sending Heartbeat For Node1
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=1, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 4] Sending Heartbeat For Node2
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=2, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 2] Timeout Updated
+[Node 4] Sending Heartbeat For Node3
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=3, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 3] Timeout Updated
+[Node 2] Running...
+[Node 3] Running...
+[Node 4] Running...
+[Node 4] Sending Heartbeat For Node1
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=1, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 4] Sending Heartbeat For Node2
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=2, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 2] Timeout Updated
+[Node 4] Sending Heartbeat For Node3
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=3, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 3] Timeout Updated
+[Node 2] Running...
+[Node 3] Running...
+[Node 1] Running...
+[Node 4] Running...
+[Node 4] Sending Heartbeat For Node1
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=1, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 1] Timeout Updated
+[Node 4] Sending Heartbeat For Node2
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=2, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 2] Timeout Updated
+[Node 4] Sending Heartbeat For Node3
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=3, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 3] Timeout Updated
+[Node 1] Running...
+[Node 3] Running...
+[Node 2] Running...
+[Node 4] Running...
+[Node 4] Sending Heartbeat For Node1
+[Node 1] Running...
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=1, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 1] Timeout Updated
+[Node 4] Sending Heartbeat For Node2
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=2, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 2] Timeout Updated
+[Node 4] Sending Heartbeat For Node3
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=3, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 3] Timeout Updated
+[Node 1] Running...
+[Node 2] Running...
+[Node 3] Running...
+[Node 4] Running...
+[Node 1] Running...
+[Node 4] Sending Heartbeat For Node1
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=1, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 1] Timeout Updated
+[Node 4] Sending Heartbeat For Node2
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=2, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 2] Timeout Updated
+[Node 4] Sending Heartbeat For Node3
+
+	     >>> [cli] createProxy CASE 1
+
+
+
+		 >>>>>> [CLT -> SVR] MSG TO BE SENT 1:	ReceiveMessage
+{toNode=3, timeout=1620965250, type='heartbeat', fromNode=4, value='4'}
+-fim-
+
+[Node 3] Timeout Updated
+[Node 1] Running...
+[Node 2] Running...
+[Node 3] Running...
