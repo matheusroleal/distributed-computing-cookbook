@@ -6,6 +6,17 @@ local mqtt = require("mqtt_library")
 
 math.randomseed(os.time())
 
+--
+-- LOCAL FUNCTIONS
+--
+function str_split(inputstr, sep)
+  local t={}
+  for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+    table.insert(t, str)
+  end
+  return t
+end
+
 function update_console_log(node_id, message)
   if (logs_size + 1) > 10 then
     logs_size = 0
@@ -27,49 +38,76 @@ end
 function mqttcb(topic, message)
   local data_received = json.decode(message)
   if not (n.id == data_received['id']) then
+    -- Mensagem hello novo nó
     if data_received['method'] == "hello" and node.new_neighbor(n.neighbors, data_received['id']) then
+      -- Adiciona vizinho ao nó
       node.add_neighbor(n.neighbors, data_received['id'])
-      message_log =  "Node " .. data_received['id'] .. " became a neighbor"
       -- Envia mensagem hello de volta para o vizinho
       data = mqtt_request_message(n, n.id, data_received['method'])
       mqtt_client:publish(topic, json.encode(data))
+      -- Envia mensagem para o console
+      message_log =  "Node " .. data_received['id'] .. " became a neighbor"
       update_console_log(n.id, message_log)
-    elseif data_received['method'] == "evento_1" then
-      node.event_detected(n, data_received['method'], topic)
+    -- Mensagem para evento 1
+    elseif data_received['method'] == "evento_1" and node.new_event(n.events, "evento_1") then
+      -- Adiciona novo evento
+      current_distance = node.get_current_distance(data_received['node'].events, data_received['method'])
+      node.event_detected(n, data_received['method'], topic, current_distance + 1)
+      -- Envia mensagem para o console
       message_log =  "Node " .. data_received['id'] .. " sent " .. data_received['method']
       update_console_log(n.id, message_log)
-    elseif data_received['method'] == "evento_2" then
-      node.event_detected(n, data_received['method'], topic)
+    -- Mensagem para evento 2
+    elseif data_received['method'] == "evento_2" and node.new_event(n.events, "evento_2") then
+      -- Adiciona novo evento
+      current_distance = node.get_current_distance(data_received['node'].events, data_received['method'])
+      node.event_detected(n, data_received['method'], topic, current_distance + 1)
+      -- Envia mensagem para o console
       message_log =  "Node " .. data_received['id'] .. " sent " .. data_received['method']
       update_console_log(n.id, message_log)
     end
   end
 end
 
+-- Reuse code for multiples servers
+if #arg < 1 then
+  print("Error: missing argument(s).\nUsage: love src [channels]")
+  os.exit()
+end
+
+channels = str_split(arg[2], ",")
+
+--
+-- LOVE ENVIROMENT
+--
 function love.mousepressed(x, y)
   if button.click(x, y, bt1) then
+    node.event_detected(n, "evento_1", n.channels, 0)
+    -- Envia mensagem de evento para vizinhos
     data = mqtt_request_message(n, n.id, "evento_1")
     for c in pairs(n.channels) do
       channel = n.channels[c]
       mqtt_client:publish(channel, json.encode(data))
     end
   elseif button.click(x, y, bt2) then
+    node.event_detected(n, "evento_2", n.channels, 0)
+    -- Envia mensagem de evento para vizinhos
     data = mqtt_request_message(n, n.id, "evento_2")
     for c in pairs(n.channels) do
       channel = n.channels[c]
       mqtt_client:publish(channel, json.encode(data))
     end
   elseif button.click(x, y, bt3) then
+    -- Envia mensagem para o console
     message_log =  "Checking for the event"
     update_console_log(n.id, message_log)
   elseif button.click(x, y, bt4) then
-    message_log = json.encode(data)
+    -- Envia mensagem para o console
+    message_log = json.encode(n)
     update_console_log(n.id, message_log)
   end
 end
 
 function love.load()
-  channels = {"controle"}
   -- Inicializa botões
   bt1 = button.create("evento 1", 20, 35, 75, 60)
   bt2 = button.create("evento 2", 115, 35, 75, 60)
@@ -84,10 +122,10 @@ function love.load()
   text = ""
   logs_size = 0
   log.initialize_log(n.id)
+  -- Inicia conexão mqtt
   for c in pairs(n.channels) do
     channel = n.channels[c]
     mqtt_client:connect(client_id)
-    -- Inicia conexão mqtt
     mqtt_client:subscribe({channel})
     -- Envia mensagem de hello para os vizinhos
     data = mqtt_request_message(n, n.id, "hello")

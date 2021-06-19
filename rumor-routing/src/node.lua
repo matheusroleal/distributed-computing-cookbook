@@ -15,7 +15,7 @@ function node.new_neighbor(neighbors, neighbor)
     local f = true
     for i = 1, #neighbors do
         if type( neighbors[i] ) == "table" then
-            f = hasValue( neighbors[i], neighbor )  --  return value from recursion
+            f = node.new_neighbor( neighbors[i], neighbor )  --  return value from recursion
             if f then break end  --  if it returned true, break out of loop
         elseif neighbors[i] == neighbor then
             return false
@@ -28,13 +28,38 @@ function node.add_neighbor(neighbors, neighbor)
     table.insert(neighbors, neighbor)
 end
 
-function node.event_detected(my_node, event_id, channel)
+function node.get_current_distance(events, event)
+    local f = true
+    for i = 1, #events do
+        if type( events[i] ) == "table" then
+            f = node.new_neighbor( events[i], event )  --  return value from recursion
+            if f then break end  --  if it returned true, break out of loop
+        elseif events[i] == event then
+            return events[i].distance
+        end
+    end
+    return 0
+end
+
+function node.new_event(events, event)
+    local f = true
+    for i = 1, #events do
+        if type( events[i] ) == "table" then
+            f = node.new_neighbor( events[i], event )  --  return value from recursion
+            if f then break end  --  if it returned true, break out of loop
+        elseif events[i] == event then
+            return false
+        end
+    end
+    return f
+end
+
+function node.event_detected(my_node, event_id, channel, distance)
     event = {}
-    event.distance = 0
-    event.id = event_name
+    event.distance = distance
+    event.id = event_id
     event.channel = channel
     table.insert(my_node.events, event)
-    -- ForwardAgent(node.ID)
 end
 
 function node.agentReceived(my_node, agent, source)
