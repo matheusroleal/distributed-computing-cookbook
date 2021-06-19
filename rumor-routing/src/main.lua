@@ -81,7 +81,7 @@ function mqttcb(topic, message)
       -- Envia mensagem para o console
       message_log =  "Node " .. data_received['id'] .. " sent " .. data_received['method']
       update_console_log(n.id, message_log)
-    -- Mensagem para consulta de evento 1
+    -- Mensagem para consulta do evento 1
     elseif data_received['method'] == "consulta_1" and agent.new_channel(data_received['node'].channels, topic) then
       if node.get_current_distance(n.events, data_received['node'].event) > 0 then
         for c in pairs(n.channels) do
@@ -94,12 +94,21 @@ function mqttcb(topic, message)
           end
         end
       else
+        print("cheguei")
         agent.add_channel(data_received['node'].channels, topic)
         agent.add_track(data_received['node'].track, n.id)
-        print("achei " .. n.id) 
-        print(json.encode(data_received))
+        -- Envia mensagem para o console
+        message_log =  "Returning request for event 1"
+        update_console_log(n.id, message_log)
+        -- Retornando request da consulta
+        data_received['node'].channels = {}
+        data = mqtt_request_message(data_received['node'], n.id, "resposta_consulta_1")
+        for c in pairs(n.channels) do
+          channel = n.channels[c]
+          mqtt_client:publish(channel, json.encode(data))
+        end
       end
-    -- Mensagem para consulta de evento 2
+    -- Mensagem para consulta do evento 2
     elseif data_received['method'] == "consulta_2" and agent.new_channel(data_received['node'].channels, topic) then
       if node.get_current_distance(n.events, data_received['node'].event) > 0 then
         for c in pairs(n.channels) do
@@ -112,10 +121,51 @@ function mqttcb(topic, message)
           end
         end
       else
+        print("cheguei")
         agent.add_channel(data_received['node'].channels, topic)
         agent.add_track(data_received['node'].track, n.id)
-        print("achei " .. n.id) 
-        print(json.encode(data_received))
+        -- Envia mensagem para o console
+        message_log =  "Returning request for event 2"
+        update_console_log(n.id, message_log)
+        -- Retornando request da consulta
+        data_received['node'].channels = {}
+        data = mqtt_request_message(data_received['node'], n.id, "resposta_consulta_2")
+        for c in pairs(n.channels) do
+          channel = n.channels[c]
+          mqtt_client:publish(channel, json.encode(data))
+        end
+      end
+    -- Mensagem para retorno da consulta do evento 1
+    elseif data_received['method'] == "resposta_consulta_1" and agent.new_channel(data_received['node'].channels, topic) then
+      if n.id == data_received['node'].id then
+        -- Envia mensagem para o console
+        message_log =  "Got the following track for event 1 " .. json.encode(data_received['node'].track)
+        update_console_log(n.id, message_log)
+      else
+        for c in pairs(n.channels) do
+          channel = n.channels[c]
+          if not (channel == topic) then
+            agent.add_channel(data_received['node'].channels, topic)
+            data = mqtt_request_message(data_received['node'], n.id, data_received['method'])
+            mqtt_client:publish(channel, json.encode(data))
+          end
+        end
+      end
+    -- Mensagem para retorno da consulta do evento 2
+    elseif data_received['method'] == "resposta_consulta_2" and agent.new_channel(data_received['node'].channels, topic) then
+      if n.id == data_received['node'].id then
+        -- Envia mensagem para o console
+        message_log =  "Got the following track for event 2 " .. json.encode(data_received['node'].track)
+        update_console_log(n.id, message_log)
+      else
+        for c in pairs(n.channels) do
+          channel = n.channels[c]
+          if not (channel == topic) then
+            agent.add_channel(data_received['node'].channels, topic)
+            data = mqtt_request_message(data_received['node'], n.id, data_received['method'])
+            mqtt_client:publish(channel, json.encode(data))
+          end
+        end
       end
     end
   end
