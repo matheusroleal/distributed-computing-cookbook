@@ -1,6 +1,7 @@
 local log = require("log")
 local node = require("node")
 local json = require ("json")
+local agent = require("agent")
 local button = require("button")
 local mqtt = require("mqtt_library")
 
@@ -80,6 +81,42 @@ function mqttcb(topic, message)
       -- Envia mensagem para o console
       message_log =  "Node " .. data_received['id'] .. " sent " .. data_received['method']
       update_console_log(n.id, message_log)
+    -- Mensagem para consulta de evento 1
+    elseif data_received['method'] == "consulta_1" and agent.new_channel(data_received['node'].channels, topic) then
+      if node.get_current_distance(n.events, data_received['node'].event) > 0 then
+        for c in pairs(n.channels) do
+          channel = n.channels[c]
+          if not (channel == topic) then
+            agent.add_channel(data_received['node'].channels, topic)
+            agent.add_track(data_received['node'].track, n.id)
+            data = mqtt_request_message(data_received['node'], n.id, data_received['method'])
+            mqtt_client:publish(channel, json.encode(data))
+          end
+        end
+      else
+        agent.add_channel(data_received['node'].channels, topic)
+        agent.add_track(data_received['node'].track, n.id)
+        print("achei " .. n.id) 
+        print(json.encode(data_received))
+      end
+    -- Mensagem para consulta de evento 2
+    elseif data_received['method'] == "consulta_2" and agent.new_channel(data_received['node'].channels, topic) then
+      if node.get_current_distance(n.events, data_received['node'].event) > 0 then
+        for c in pairs(n.channels) do
+          channel = n.channels[c]
+          if not (channel == topic) then
+            agent.add_channel(data_received['node'].channels, topic)
+            agent.add_track(data_received['node'].track, n.id)
+            data = mqtt_request_message(data_received['node'], n.id, data_received['method'])
+            mqtt_client:publish(channel, json.encode(data))
+          end
+        end
+      else
+        agent.add_channel(data_received['node'].channels, topic)
+        agent.add_track(data_received['node'].track, n.id)
+        print("achei " .. n.id) 
+        print(json.encode(data_received))
+      end
     end
   end
 end
@@ -113,10 +150,32 @@ function love.mousepressed(x, y)
       mqtt_client:publish(channel, json.encode(data))
     end
   elseif button.click(x, y, bt3) then
+    -- Cria agente para busca do evento 1
+    a = agent.create(n.id, "evento_1", {})
+    -- Envia mensagem para todos vizinhos
+    data = mqtt_request_message(a, n.id, "consulta_1")
+    for c in pairs(n.channels) do
+      channel = n.channels[c]
+      agent.add_track(a.track, n.id)
+      mqtt_client:publish(channel, json.encode(data))
+    end
     -- Envia mensagem para o console
-    message_log =  "Checking for the event"
+    message_log =  "Checking for the event 1"
     update_console_log(n.id, message_log)
   elseif button.click(x, y, bt4) then
+    -- Cria agente para busca do evento 2
+    a = agent.create(n.id, "evento_2", {})
+    -- Envia mensagem para todos vizinhos
+    data = mqtt_request_message(a, n.id, "consulta_2")
+    for c in pairs(n.channels) do
+      channel = n.channels[c]
+      agent.add_track(a.track, n.id)
+      mqtt_client:publish(channel, json.encode(data))
+    end
+    -- Envia mensagem para o console
+    message_log =  "Checking for the event 2"
+    update_console_log(n.id, message_log)
+  elseif button.click(x, y, bt5) then
     -- Envia mensagem para o console
     message_log = json.encode(n)
     update_console_log(n.id, message_log)
@@ -125,10 +184,11 @@ end
 
 function love.load()
   -- Inicializa botões
-  bt1 = button.create("evento 1", 20, 35, 75, 60)
-  bt2 = button.create("evento 2", 115, 35, 75, 60)
-  bt3 = button.create("consulta", 210, 35, 75, 60)
-  bt4 = button.create("estado", 305, 35, 75, 60)
+  bt1 = button.create("evento 1", 5, 35, 75, 60)
+  bt2 = button.create("evento 2", 83.5, 35, 75, 60)
+  bt3 = button.create("consulta 1", 162.5, 35, 75, 60)
+  bt4 = button.create("consulta 2", 241, 35, 75, 60)
+  bt5 = button.create("estado", 320, 35, 75, 60)
   -- Inicia nó
   n = node.create(channels)
   -- Setup conexão mqtt
@@ -158,7 +218,8 @@ function love.draw()
   button.draw(0.18, 0.8, 0.443, bt1.x, bt1.y, bt1.width, bt1.height, bt1.text)
   button.draw(0.18, 0.8, 0.443, bt2.x, bt2.y, bt2.width, bt2.height, bt2.text)
   button.draw(0.2, 0.596, 0.86, bt3.x, bt3.y, bt3.width, bt3.height, bt3.text)
-  button.draw(0.96, 0.69, 0.255, bt4.x, bt4.y, bt4.width, bt4.height, bt4.text)
+  button.draw(0.2, 0.596, 0.86, bt4.x, bt4.y, bt4.width, bt4.height, bt4.text)
+  button.draw(0.96, 0.69, 0.255, bt5.x, bt5.y, bt5.width, bt5.height, bt5.text)
   -- Desenha Caixa de Log 
   love.graphics.print("log", 20, 110)
   love.graphics.setColor(0.337,0.396,0.45)
