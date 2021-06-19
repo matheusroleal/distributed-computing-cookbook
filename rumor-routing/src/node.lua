@@ -29,12 +29,9 @@ function node.add_neighbor(neighbors, neighbor)
 end
 
 function node.get_current_distance(events, event)
-    local f = true
-    for i = 1, #events do
-        if type( events[i] ) == "table" then
-            f = node.new_neighbor( events[i], event )  --  return value from recursion
-            if f then break end  --  if it returned true, break out of loop
-        elseif events[i] == event then
+    for i in pairs(events) do
+        e = events[i]
+        if e.id == event then
             return events[i].distance
         end
     end
@@ -42,16 +39,13 @@ function node.get_current_distance(events, event)
 end
 
 function node.new_event(events, event)
-    local f = true
-    for i = 1, #events do
-        if type( events[i] ) == "table" then
-            f = node.new_neighbor( events[i], event )  --  return value from recursion
-            if f then break end  --  if it returned true, break out of loop
-        elseif events[i] == event then
+    for i in pairs(events) do
+        e = events[i]
+        if e.id == event then
             return false
         end
     end
-    return f
+    return true
 end
 
 function node.event_detected(my_node, event_id, channel, distance)

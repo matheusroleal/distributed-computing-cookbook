@@ -49,18 +49,34 @@ function mqttcb(topic, message)
       message_log =  "Node " .. data_received['id'] .. " became a neighbor"
       update_console_log(n.id, message_log)
     -- Mensagem para evento 1
-    elseif data_received['method'] == "evento_1" and node.new_event(n.events, "evento_1") then
+    elseif data_received['method'] == "evento_1" and node.new_event(n.events, data_received['method']) then
       -- Adiciona novo evento
       current_distance = node.get_current_distance(data_received['node'].events, data_received['method'])
       node.event_detected(n, data_received['method'], topic, current_distance + 1)
+      -- Envia mensagem para os outros canais
+      for c in pairs(n.channels) do
+        channel = n.channels[c]
+        if not (channel == topic) then
+          data = mqtt_request_message(n, n.id, data_received['method'])
+          mqtt_client:publish(channel, json.encode(data))
+        end
+      end
       -- Envia mensagem para o console
       message_log =  "Node " .. data_received['id'] .. " sent " .. data_received['method']
       update_console_log(n.id, message_log)
     -- Mensagem para evento 2
-    elseif data_received['method'] == "evento_2" and node.new_event(n.events, "evento_2") then
+    elseif data_received['method'] == "evento_2" and node.new_event(n.events, data_received['method']) then
       -- Adiciona novo evento
       current_distance = node.get_current_distance(data_received['node'].events, data_received['method'])
       node.event_detected(n, data_received['method'], topic, current_distance + 1)
+      -- Envia mensagem para os outros canais
+      for c in pairs(n.channels) do
+        channel = n.channels[c]
+        if not (channel == topic) then
+          data = mqtt_request_message(n, n.id, data_received['method'])
+          mqtt_client:publish(channel, json.encode(data))
+        end
+      end
       -- Envia mensagem para o console
       message_log =  "Node " .. data_received['id'] .. " sent " .. data_received['method']
       update_console_log(n.id, message_log)
