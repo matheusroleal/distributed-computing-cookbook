@@ -10,7 +10,7 @@ echo "n3 ---- CH2 ---- n4"
 echo ""
 
 # n1
-/Applications/love.app/Contents/MacOS/love src CH1 &
+/Applications/love.app/Contents/MacOS/love src CH1,CH2 &
 
 sleep 3
 
@@ -20,7 +20,7 @@ sleep 3
 sleep 3
 
 # n3
-/Applications/love.app/Contents/MacOS/love src CH2 &
+/Applications/love.app/Contents/MacOS/love src CH1,CH2 &
 
 sleep 3
 

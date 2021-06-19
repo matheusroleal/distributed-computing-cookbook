@@ -18,13 +18,29 @@ function str_split(inputstr, sep)
   return t
 end
 
+function splitByChunk(str_text, chunkSize)
+  local s = {}
+  for i=1, #str_text, chunkSize do
+      s[#s+1] = str_text:sub(i,i+chunkSize - 1)
+  end
+  return s
+end
+
 function update_console_log(node_id, message)
   if (logs_size + 1) > 10 then
     logs_size = 0
     text = ""
   end
-  text = text .. message .. "\n"
-  logs_size = logs_size + 1
+  if string.len(message) > 40 then
+    chunks_log = splitByChunk(message, 40)
+    for i,v in ipairs(chunks_log) do
+      text = text .. v .. "\n"
+      logs_size = logs_size + 1
+    end
+  else
+    text = text .. message .. "\n"
+    logs_size = logs_size + 1
+  end
   log.write_log_file(node_id, message)
 end
 
