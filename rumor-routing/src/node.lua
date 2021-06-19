@@ -11,11 +11,24 @@ function node.create(neighbors_channel)
     return my_node
 end
 
-function node.addNeighbor(neighbors, neighbor)
+function node.new_neighbor(neighbors, neighbor)
+    local f = true
+    for i = 1, #neighbors do
+        if type( neighbors[i] ) == "table" then
+            f = hasValue( neighbors[i], neighbor )  --  return value from recursion
+            if f then break end  --  if it returned true, break out of loop
+        elseif neighbors[i] == neighbor then
+            return false
+        end
+    end
+    return f
+end
+
+function node.add_neighbor(neighbors, neighbor)
     table.insert(neighbors, neighbor)
 end
 
-function node.eventDetected(my_node, event_id, channel)
+function node.event_detected(my_node, event_id, channel)
     event = {}
     event.distance = 0
     event.id = event_name
