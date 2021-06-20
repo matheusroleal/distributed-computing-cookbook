@@ -10,17 +10,26 @@ function agent.add_channel(channels, channel)
     table.insert(channels, channel)
 end
 
-function agent.new_channel(channels, channel)
-    local f = true
-    for i = 1, #channels do
-        if type( channels[i] ) == "table" then
-            f = agent.new_channel( channels[i], channel )  --  return value from recursion
-            if f then break end  --  if it returned true, break out of loop
-        elseif channels[i] == channel then
+-- function agent.new_channel(channels, channel)
+--     local f = true
+--     for i = 1, #channels do
+--         if type( channels[i] ) == "table" then
+--             f = agent.new_channel( channels[i], channel )  --  return value from recursion
+--             if f then break end  --  if it returned true, break out of loop
+--         elseif channels[i] == channel then
+--             return false
+--         end
+--     end
+--     return f
+-- end
+
+function agent.new_channel(table, key)
+    for i, v in pairs(table) do
+        if v == key then
             return false
         end
     end
-    return f
+    return true
 end
 
 function agent.create(node_id, event, track)

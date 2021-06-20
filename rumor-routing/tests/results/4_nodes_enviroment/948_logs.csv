@@ -1,0 +1,15 @@
+node;message;timestamp
+948;Node 979 became a neighbor;22:44:28:614254
+948;Node 248 became a neighbor;22:44:31:778743
+948;Node 20 became a neighbor;22:44:34:941973
+948;{"channels":["CH1","CH2"],"neighbors":[979,248,20],"events":[{"channel":["CH1","CH2"],"id":"evento_1","distance":0,"ttl":3,"next_node":979,"track":[948]}],"id":948};22:44:42:503464
+948;Returning request for event 1;22:44:52:163604
+948;Returning request for event 1;22:44:52:165644
+948;Returning request for event 1;22:44:52:166261
+948;Returning request for event 1;22:44:52:166715
+948;Returning request for event 1;22:44:52:168801
+948;Returning request for event 1;22:44:52:169285
+948;Node 248 sent evento_2;22:44:58:536564
+948;{"channels":["CH1","CH2"],"neighbors":[979,248,20],"events":[{"channel":["CH1","CH2"],"id":"evento_1","distance":0,"ttl":3,"next_node":979,"track":[948]},{"channel":"CH2","id":"evento_2","distance":2,"ttl":1,"next_node":979,"track":[20,248,948]}],"id":948};22:45:8:112556
+948;Checking for the event 2;22:45:13:511498
+948;Got the following track for event 2 [948,20];22:45:13:514651

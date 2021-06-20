@@ -1,8 +1,0 @@
-node;message;timestamp
-593;Node 62 became a neighbor;19:10:4:281252
-593;Node 459 became a neighbor;19:10:7:575364
-593;Node 545 became a neighbor;19:10:10:738326
-593;Node 459 sent evento_1;19:10:17:240249
-593;{"channels":["CH1","CH2"],"neighbors":[62,459,545],"events":[{"distance":1,"channel":"CH2","id":"evento_1"}],"id":593};19:10:21:504755
-593;Node 62 sent evento_2;19:10:50:262527
-593;{"channels":["CH1","CH2"],"neighbors":[62,459,545],"events":[{"distance":1,"channel":"CH2","id":"evento_1"},{"distance":1,"channel":"CH1","id":"evento_2"}],"id":593};19:10:56:614079

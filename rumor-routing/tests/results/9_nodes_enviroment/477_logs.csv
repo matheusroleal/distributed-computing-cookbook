@@ -1,0 +1,9 @@
+node;message;timestamp
+477;Node 40 became a neighbor;22:46:53:308712
+477;Node 445 became a neighbor;22:46:53:309133
+477;Node 195 became a neighbor;22:46:53:309638
+477;Node 443 became a neighbor;22:46:53:31002
+477;Node 411 became a neighbor;22:46:56:661217
+477;{"channels":["CH2","CH3"],"neighbors":[40,445,195,443,411],"events":[],"id":477};22:47:34:339521
+477;Checking for the event 1;22:47:53:802888
+477;Got the following track for event 1 [477,443,443,443,876];22:47:53:810285

@@ -1,0 +1,7 @@
+node;message;timestamp
+921;Node 195 became a neighbor;22:47:2:29999
+921;Node 443 became a neighbor;22:47:2:300461
+921;Node 411 became a neighbor;22:47:2:30085
+921;Node 714 became a neighbor;22:47:2:301226
+921;Node 876 became a neighbor;22:47:5:661934
+921;{"channels":["CH4","CH5","CH6"],"neighbors":[195,443,411,714,876],"events":[],"id":921};22:47:41:431943

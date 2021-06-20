@@ -35,7 +35,17 @@ function node.get_current_distance(events, event)
             return events[i].distance
         end
     end
-    return 0
+    return nil
+end
+
+function node.get_event(events, event)
+    for i in pairs(events) do
+        e = events[i]
+        if e.id == event then
+            return events[i]
+        end
+    end
+    return nil
 end
 
 function node.new_event(events, event)
@@ -48,45 +58,29 @@ function node.new_event(events, event)
     return true
 end
 
-function node.event_detected(my_node, event_id, channel, distance)
-    event = {}
-    event.distance = distance
-    event.id = event_id
-    event.channel = channel
-    table.insert(my_node.events, event)
-end
-
-function node.agentReceived(my_node, agent, source)
-    agent.num_hops = agent.num_hops + 1
-    -- update the node's events table based on the agent's
-    for e in pairs(agent.events) do
-        if not (my_node.events[e]) or (my_node.events[e].num_hops > agent.events[e]) then
-            my_node.events[e].distance = agent.num_hops - agent.events[e].visit_time
-            agent.events[e].direction = source
+function node.generate_next_node(neighbors, track)
+    for n in pairs(neighbors) do
+        neighbor = neighbors[n]
+        if node.new_neighbor(track, neighbor) then
+            return neighbor
         end
     end
-    -- update the agent's events table based on the node's
-    for e in pairs(my_node.events) do
-        agent.events[e].visit_time = (- my_node.events[e].distance)
-    end
-    if agent.num_hops < agent_ttl then
-        -- destination = pick neighbor based on agent forwarding policy
-        forwardAgent(agent, destination)
-    end
+    return nil
 end
 
-function node.queryReceived(my_node, query, source)
-    query.ttl = query.ttl - 1
-    -- the query reached a valid destination
-    if my_node.events[query.event_name].distance == 0 then
-        handleValidQuery(query)
-    -- the node has a path to the event
-    elseif my_node.events[query.event_name].distance > 0 then
-        forwardQuery(query, my_node.events[query.event_name].direction)
-    else
-        -- destination = pick neighbor based on query forwarding policy
-        forwardQuery(query, destination)
-    end
+function node.add_event_track(track, segment)
+    table.insert(track, segment)
+end
+
+function node.event_detected(my_node, event_id, channel, distance, ttl, next_node, track)
+    my_event = {}
+    my_event.distance = distance
+    my_event.id = event_id
+    my_event.channel = channel
+    my_event.ttl = ttl
+    my_event.next_node = next_node
+    my_event.track = track
+    table.insert(my_node.events, my_event)
 end
 
 return node

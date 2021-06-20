@@ -1,0 +1,11 @@
+node;message;timestamp
+443;Node 195 became a neighbor;22:46:50:303154
+443;Node 40 became a neighbor;22:46:50:303542
+443;Node 445 became a neighbor;22:46:50:303974
+443;Node 477 became a neighbor;22:46:53:647103
+443;Node 411 became a neighbor;22:46:56:837405
+443;Node 714 became a neighbor;22:46:59:038435
+443;Node 921 became a neighbor;22:47:2:241664
+443;Node 876 became a neighbor;22:47:5:453632
+443;Node 876 sent evento_1;22:47:28:201382
+443;{"channels":["CH1","CH2","CH3","CH5"],"neighbors":[195,40,445,477,411,714,921,876],"events":[{"channel":"CH5","id":"evento_1","distance":1,"ttl":2,"next_node":195,"track":[876,443]}],"id":443};22:47:44:375814

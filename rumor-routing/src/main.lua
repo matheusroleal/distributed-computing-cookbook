@@ -6,7 +6,8 @@ local button = require("button")
 local mqtt = require("mqtt_library")
 
 math.randomseed(os.time())
-
+first_data_received_search_1 = true
+first_data_received_search_2 = true
 --
 -- LOCAL FUNCTIONS
 --
@@ -32,7 +33,7 @@ function update_console_log(node_id, message)
     text = ""
   end
   if string.len(message) > 40 then
-    chunks_log = splitByChunk(message, 40)
+    chunks_log = splitByChunk(message, 45)
     for i,v in ipairs(chunks_log) do
       text = text .. v .. "\n"
       logs_size = logs_size + 1
@@ -67,38 +68,50 @@ function mqttcb(topic, message)
       update_console_log(n.id, message_log)
     -- message for event 1
     elseif data_received['method'] == "evento_1" and node.new_event(n.events, data_received['method']) then
-      -- add new event
-      current_distance = node.get_current_distance(data_received['node'].events, data_received['method'])
-      node.event_detected(n, data_received['method'], topic, current_distance + 1)
-      -- send message to other channels
-      for c in pairs(n.channels) do
-        channel = n.channels[c]
-        if not (channel == topic) then
-          data = mqtt_request_message(n, n.id, data_received['method'])
-          mqtt_client:publish(channel, json.encode(data))
+      local current_event = node.get_event(data_received['node'].events, data_received['method'])
+      if current_event.ttl > 0 and current_event.next_node == n.id then
+        -- add new event
+        node.add_event_track(current_event.track, current_event.next_node)
+        local next_node = node.generate_next_node(n.neighbors, current_event.track)
+        if not (next_node == nil) then
+          node.event_detected(n, data_received['method'], topic, current_event.distance + 1, current_event.ttl - 1, next_node, current_event.track)
+          -- send message to other channels
+          for c in pairs(n.channels) do
+            channel = n.channels[c]
+            if not (channel == topic) then
+              data = mqtt_request_message(n, n.id, data_received['method'])
+              mqtt_client:publish(channel, json.encode(data))
+            end
+          end
+          -- send message to console
+          message_log =  "Node " .. data_received['id'] .. " sent " .. data_received['method']
+          update_console_log(n.id, message_log)
         end
       end
-      -- send message to console
-      message_log =  "Node " .. data_received['id'] .. " sent " .. data_received['method']
-      update_console_log(n.id, message_log)
     -- message for event 2
     elseif data_received['method'] == "evento_2" and node.new_event(n.events, data_received['method']) then
-      -- add new event
-      current_distance = node.get_current_distance(data_received['node'].events, data_received['method'])
-      node.event_detected(n, data_received['method'], topic, current_distance + 1)
-      -- send message to other channels
-      for c in pairs(n.channels) do
-        channel = n.channels[c]
-        if not (channel == topic) then
-          data = mqtt_request_message(n, n.id, data_received['method'])
-          mqtt_client:publish(channel, json.encode(data))
+      local current_event = node.get_event(data_received['node'].events, data_received['method'])
+      if current_event.ttl > 0 and current_event.next_node == n.id then
+        -- add new event
+        node.add_event_track(current_event.track, current_event.next_node)
+        local next_node = node.generate_next_node(n.neighbors, current_event.track)
+        if not (next_node == nil) then
+          node.event_detected(n, data_received['method'], topic, current_event.distance + 1, current_event.ttl - 1, next_node, current_event.track)
+          -- send message to other channels
+          for c in pairs(n.channels) do
+            channel = n.channels[c]
+            if not (channel == topic) then
+              data = mqtt_request_message(n, n.id, data_received['method'])
+              mqtt_client:publish(channel, json.encode(data))
+            end
+          end
+          -- send message to console
+          message_log =  "Node " .. data_received['id'] .. " sent " .. data_received['method']
+          update_console_log(n.id, message_log)
         end
       end
-      -- send message to console
-      message_log =  "Node " .. data_received['id'] .. " sent " .. data_received['method']
-      update_console_log(n.id, message_log)
     -- event 1 query message
-    elseif data_received['method'] == "consulta_1" and agent.new_channel(data_received['node'].channels, topic) then
+    elseif data_received['method'] == "consulta_1" and agent.new_channel(data_received['node'].channels, topic) and node.get_current_distance(n.events, data_received['node'].event) then
       if node.get_current_distance(n.events, data_received['node'].event) > 0 then
         for c in pairs(n.channels) do
           channel = n.channels[c]
@@ -125,7 +138,7 @@ function mqttcb(topic, message)
         end
       end
     -- event 2 query message
-    elseif data_received['method'] == "consulta_2" and agent.new_channel(data_received['node'].channels, topic) then
+    elseif data_received['method'] == "consulta_2" and agent.new_channel(data_received['node'].channels, topic) and node.get_current_distance(n.events, data_received['node'].event) then
       if node.get_current_distance(n.events, data_received['node'].event) > 0 then
         for c in pairs(n.channels) do
           channel = n.channels[c]
@@ -153,14 +166,15 @@ function mqttcb(topic, message)
       end
     -- event 1 query return message
     elseif data_received['method'] == "resposta_consulta_1" and agent.new_channel(data_received['node'].channels, topic) then
-      if n.id == data_received['node'].id then
+      if n.id == data_received['node'].id and first_data_received_search_1 then
+        first_data_received_search_1 = false
         -- send message to console
         message_log =  "Got the following track for event 1 " .. json.encode(data_received['node'].track)
         update_console_log(n.id, message_log)
       else
         for c in pairs(n.channels) do
           channel = n.channels[c]
-          if not (channel == topic) then
+          if not (channel == topic) and agent.new_channel(data_received['node'].channels, topic) and node.get_current_distance(n.events, data_received['node'].event) then
             agent.add_channel(data_received['node'].channels, topic)
             data = mqtt_request_message(data_received['node'], n.id, data_received['method'])
             mqtt_client:publish(channel, json.encode(data))
@@ -169,14 +183,15 @@ function mqttcb(topic, message)
       end
     -- event 2 query return message
     elseif data_received['method'] == "resposta_consulta_2" and agent.new_channel(data_received['node'].channels, topic) then
-      if n.id == data_received['node'].id then
+      if n.id == data_received['node'].id and first_data_received_search_2 then
+        first_data_received_search_2 = false
         -- send message to console
         message_log =  "Got the following track for event 2 " .. json.encode(data_received['node'].track)
         update_console_log(n.id, message_log)
       else
         for c in pairs(n.channels) do
           channel = n.channels[c]
-          if not (channel == topic) then
+          if not (channel == topic) and agent.new_channel(data_received['node'].channels, topic) and node.get_current_distance(n.events, data_received['node'].event) then
             agent.add_channel(data_received['node'].channels, topic)
             data = mqtt_request_message(data_received['node'], n.id, data_received['method'])
             mqtt_client:publish(channel, json.encode(data))
@@ -200,7 +215,8 @@ channels = str_split(arg[2], ",")
 --
 function love.mousepressed(x, y)
   if button.click(x, y, bt1) then
-    node.event_detected(n, "evento_1", n.channels, 0)
+    local next_node = node.generate_next_node(n.neighbors, {})
+    node.event_detected(n, "evento_1", n.channels, 0, 3, next_node, {n.id})
     -- send event message to neighbors
     data = mqtt_request_message(n, n.id, "evento_1")
     for c in pairs(n.channels) do
@@ -208,7 +224,8 @@ function love.mousepressed(x, y)
       mqtt_client:publish(channel, json.encode(data))
     end
   elseif button.click(x, y, bt2) then
-    node.event_detected(n, "evento_2", n.channels, 0)
+    local next_node = node.generate_next_node(n.neighbors, {})
+    node.event_detected(n, "evento_2", n.channels, 0, 3, next_node, {n.id})
     -- send event message to neighbors
     data = mqtt_request_message(n, n.id, "evento_2")
     for c in pairs(n.channels) do
