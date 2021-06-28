@@ -62,6 +62,7 @@ local function deserialize_helper(iter)
 	local t,v = token:match('(%w+)(%b<>)')
 	return (converter[t] or error)(v:sub(2,-2)), deserialize_helper(iter)
 end
+
 local function deserialize(str)
 	return deserialize_helper(str:gmatch('%w+%b<>'))
 end
